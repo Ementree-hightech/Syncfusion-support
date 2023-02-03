@@ -1,27 +1,16 @@
-# Untitled
+# Syncfusion support test project
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 15.0.1.
+This test project was created to resolve all issues that appeared in the work project. 
+All dependencies are copied from the work project, please do not update the Angular version or version of other packages, because moving the work project to a new package version can take a lot of time and effort.
 
-## Development server
+All issues reproduced on both MacOS and Windows
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
+## Versions
 
-## Code scaffolding
+- Angular CLI: 8.2.2 
+- Node: 16.17.1 
+- Angular: 8.2.14
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+## Issues
 
-## Build
-
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
-
-## Running unit tests
-
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
-
-## Running end-to-end tests
-
-Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
-
-## Further help
-
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+1. The scheduler is not working properly with multiple data sources - https://monosnap.com/file/O56ZHffYd950VNgyekhoP5r3Jh2yWS
