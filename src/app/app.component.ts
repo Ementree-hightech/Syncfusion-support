@@ -1,11 +1,14 @@
-import { Component } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import {
   EventRenderedArgs,
-  EventSettingsModel, GroupModel, NavigatingEventArgs,
-  ResourcesModel, TimeScaleModel
+  ScheduleComponent,
+  EventSettingsModel,
+  GroupModel,
+  NavigatingEventArgs, TimeScaleModel
 } from '@syncfusion/ej2-angular-schedule';
-import { fifaEventsData } from './datasource';
+import {fifaEventsData, resourceData} from './datasource';
 import {of, Subscription} from "rxjs";
+import {delay} from "rxjs/operators";
 
 @Component({
   selector: 'app-root',
@@ -18,49 +21,68 @@ export class AppComponent {
   public eventSettings: EventSettingsModel = { dataSource: fifaEventsData };
   public selectedDate: Date = new Date(2018, 5, 15);
   currentView: string = 'Month';
-  groupByGroups: GroupModel = {resources: ['Resource1']};
-  public timeScale: TimeScaleModel = { enable: true, interval: 60, slotCount: 1 };
-  resources: ResourcesModel[] = [
-    {
-      name: 'Resource1',
-      field: 'GroupId',
-      title: 'Group',
-      textField: 'Subject',
-      idField: 'Id',
-      dataSource: []
-    },
-  ]
+  groupByGroups: GroupModel = { resources: ['Resource1'] };
+  groupByRoom: GroupModel = { resources: ['Resource2'] };
+  public fifaDataSource = [];
+  public resourceDataSource = [];
+  @ViewChild('scheduleObj', { static: true })
+  public scheduleObj: ScheduleComponent;
+  public byHourTimeScale: TimeScaleModel = {enable: true, interval: 60, slotCount: 1};
+  serverData: any[];
+  currentViewIndex: number = 0;
 
   constructor() {
     this.fillResources();
   }
 
-  fillResources() {
-    if (this.resourceLoading)
-      this.resourceLoading.unsubscribe();
+  flag: boolean = true;
+  refreshSchedule() {
+    setTimeout(() => {
+      this.flag = false;
+      this.scheduleObj.changeCurrentView(
+        this.currentView as any,
+        this.currentViewIndex
+      );
+      this.flag = true;
+    }, 1);
+  }
 
-    of(fifaEventsData)
-      .subscribe(data => {
-        this.resourceLoading = null;
-        this.resources = [{
-          name: 'Resource1',
-          field: 'GroupId',
-          title: 'Group',
-          textField: 'Subject',
-          idField: 'Id',
-          dataSource: data
-          }]
+   fillResources() {
+    if (this.resourceLoading) this.resourceLoading.unsubscribe();
 
-        this.eventSettings = {
-          dataSource: data
-        };
-      },() => {
+
+    if (this.scheduleObj) {
+      this.scheduleObj.showSpinner()
+    }
+    of([fifaEventsData, resourceData])
+      // imitation of http request
+      .pipe(delay(2000))
+      .subscribe(
+      (data) => {
+        if (this.scheduleObj) {
+          this.resourceLoading = null;
+          this.fifaDataSource = data[0]
+          this.resourceDataSource = data[1]
+          this.scheduleObj.resources[0].dataSource = data[0];
+          this.scheduleObj.resources[1].dataSource = data[1];
+          this.serverData = data;
+          this.scheduleObj.eventSettings.dataSource = data;
+          this.scheduleObj.hideSpinner()
+          this.refreshSchedule();
+        } else {
+          // Initial loading
+          this.eventSettings = {
+            dataSource: data,
+          };
+        }
+      },
+      () => {
         this.resourceLoading = null;
-        this.resources = []
         this.eventSettings = {
-          dataSource: []
+          dataSource: [],
         };
-      })
+      }
+    );
   }
 
   eventRendered(args: EventRenderedArgs) {
@@ -72,18 +94,26 @@ export class AppComponent {
   }
 
   navigating($event: NavigatingEventArgs) {
-    switch ($event.action) {
-      case "view":
-        this.currentView = $event.currentView;
-        break;
-      case "date":
-        this.fillResources();
-        break;
+    if (this.flag) {
+      switch ($event.action) {
+        case "view":
+          this.currentView = $event.currentView;
+          this.currentViewIndex = $event.viewIndex;
+          this.prepareDataToView()
+          break;
+        case 'date':
+          this.fillResources();
+          break;
+      }
     }
   }
 
+  prepareDataToView() {
+    this.fillResources()
+  }
+
   public getHeaderStyles(data: Record<string, any>): Record<string, any> {
-    return {background: data.color, color: '#FFFFFF', fontWeight: 'bolder'};
+    return { background: data.color, color: '#FFFFFF', fontWeight: 'bolder' };
   }
 
   public getHeaderDetails(data: { [key: string]: string }): string {
@@ -91,6 +121,6 @@ export class AppComponent {
   }
 
   click() {
-    this.fillResources()
+    this.fillResources();
   }
 }

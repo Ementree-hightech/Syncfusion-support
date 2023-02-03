@@ -1,56 +1,118 @@
-<button type='button'
-        style="margin: 80px 10px 10px 10px"
-        (click)="click()">
+<button type="button" style="margin: 80px 10px 10px 10px" (click)="click()">
   Reload Resources
 </button>
 
-
-<ejs-schedule width='100%' height='750px'
-              [rowAutoHeight]="true"
-              [resources]="resources"
-              [readonly]="true"
-              [eventSettings]="eventSettings"
-              (eventRendered)="eventRendered($event)"
-              [cssClass]="'syncfusion-scheduler'"
-              [selectedDate]="selectedDate"
-              (navigating)="navigating($event)">
+<ejs-schedule
+  width="100%"
+  height="750px"
+  id="scheduleObj"
+  #scheduleObj
+  [rowAutoHeight]="true"
+  [eventSettings]="eventSettings"
+  (eventRendered)="eventRendered($event)"
+  [cssClass]="'syncfusion-scheduler'"
+  [selectedDate]="selectedDate"
+  (navigating)="navigating($event)"
+>
+  <e-resources>
+    <e-resource
+      field="GroupId"
+      title="Group"
+      name="Resource1"
+      [dataSource]="fifaDataSource"
+      textField="Subject"
+      idField="Id"
+    >
+    </e-resource>
+    <e-resource
+      field="RoomId"
+      title="GroupByCity"
+      name="Resource2"
+      [dataSource]="resourceDataSource"
+      textField="Subject"
+      idField="Id"
+    >
+    </e-resource>
+  </e-resources>
   <e-views>
-    <e-view displayName="Monthly"
-            option="Month"
-            [isSelected]="true"
-            [eventTemplate]="eventTemplate">
-      <ng-template #eventTemplate let-data>
-        <div class="calendar-event">
-          <div>{{data.City}}</div>
-        </div>
-      </ng-template>
+    <e-view
+      displayName="Monthly"
+      option="Month"
+      [isSelected]="true"
+      [allowVirtualScrolling]="true"
+      [eventTemplate]="monthEventTemplate"
+    >
+    </e-view>
+
+    <e-view
+      displayName="Bi-Weekly"
+      option="Month"
+      numberOfWeeks="2"
+      [allowVirtualScrolling]="true"
+      [eventTemplate]="monthEventTemplate"
+    >
+    </e-view>
+
+    <e-view
+      displayName="Day by hour"
+      option="TimelineDay"
+      [timeScale]="byHourTimeScale"
+      [group]="groupByGroups"
+      [allowVirtualScrolling]="true"
+      [eventTemplate]="groupedEventTemplate"
+    >
+    </e-view>
+
+    <e-view
+      displayName="Day by hour 2"
+      option="TimelineDay"
+      [timeScale]="byHourTimeScale"
+      [group]="groupByRoom"
+      [allowVirtualScrolling]="true"
+      [eventTemplate]="groupedEventTemplate"
+    >
     </e-view>
 
     <e-view
       displayName="Grouped"
-      option="TimelineWeek"
+      option="Week"
       [group]="groupByGroups"
-      [resourceHeaderTemplate]="eventTemplate2"
-      [timeScale]="timeScale"
+      [allowVirtualScrolling]="true"
+      [resourceHeaderTemplate]="eventTemplateHeader"
+      [eventTemplate]="groupedEventTemplate"
     >
-      <ng-template #eventTemplate2 let-data>
-        <div>{{data.resourceData['City']}}</div>
-      </ng-template>
     </e-view>
+
+    <ng-template #eventTemplateHeader let-data>
+      <div>{{ data.City }}</div>
+    </ng-template>
+    <ng-template #monthEventTemplate let-data>
+      <div class="calendar-event">
+        <div>{{ data.City }}</div>
+        <div>{{ data.Description }}</div>
+      </div>
+    </ng-template>
+
+    <ng-template #groupedEventTemplate let-data>
+      <div>{{ data.Subject }}</div>
+    </ng-template>
+
   </e-views>
 
   <!-- Header template -->
   <ng-template #quickInfoTemplatesHeader let-data>
     <div class="quick-info-header">
       <div class="quick-info-header-content" [ngStyle]="getHeaderStyles(data)">
-        <div class="duration-text">{{getHeaderDetails(data)}}</div>
+        <div class="duration-text">{{ getHeaderDetails(data) }}</div>
       </div>
     </div>
   </ng-template>
   <!-- Content Template -->
   <ng-template #quickInfoTemplatesContent let-data>
-    <ng-container [ngTemplateOutlet]="eventContent"
-                  [ngTemplateOutletContext]="{data:data}"></ng-container>
+    <ng-container
+      [ngTemplateOutlet]="eventContent"
+      [ngTemplateOutletContext]="{ data: data }"
+    ></ng-container>
   </ng-template>
 
   <ng-template #eventContent let-data="data">
@@ -58,11 +120,9 @@
       <div class="event-content">
         <div>
           <label>Data</label>:
-          <span>{{data.City}}</span>
+          <span>{{ data.City }}</span>
         </div>
       </div>
     </div>
   </ng-template>
 </ejs-schedule>
-
-
