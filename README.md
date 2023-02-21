@@ -10,7 +10,3 @@ All issues reproduced on both MacOS and Windows
 - Angular CLI: 8.2.2 
 - Node: 16.17.1 
 - Angular: 8.2.14
-
-## Issues
-
-1. The scheduler is not working properly with multiple data sources - https://monosnap.com/file/O56ZHffYd950VNgyekhoP5r3Jh2yWS
